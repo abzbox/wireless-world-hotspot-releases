@@ -12,12 +12,20 @@ jobs:
         run: |
           set -euo pipefail
           cat staging/apk-part-* | tr -d '\n' | base64 -d > WirelessWorldHotspot.apk
-          echo "b577c444a8b9476acfdf4a4cb1afe657dc48bbe054819c5026b7e2f0ca958798  WirelessWorldHotspot.apk" | sha256sum -c -
-          test "$(wc -c < WirelessWorldHotspot.apk)" -eq 1870634
+          echo "4ab00504ac8022c87515b88de4a1cb11096a0fcdc5009269a592643fdeeaaff9  WirelessWorldHotspot.apk" | sha256sum -c -
+          test "$(wc -c < WirelessWorldHotspot.apk)" -eq 1872451
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v1.0.3 WirelessWorldHotspot.apk \
-            --title "Wireless World Hotspot v1.0.3" \
-            --notes "Public download of Wireless World Hotspot for Android (v1.0.3, versionCode 4). This APK contains no secrets. On your phone, open the APK and allow install from this source if Android asks."
+          gh release create v1.0.4 WirelessWorldHotspot.apk \
+            --title "Wireless World Hotspot v1.0.4" \
+            --notes "Public download of Wireless World Hotspot for Android (v1.0.4, versionCode 5). This APK contains no secrets. Upgrade over v1.0.3 with the same signing key. On your phone, open the APK and allow install from this source if Android asks."
+      - name: Remove temporary staging files
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -r staging
+          git commit -m "Remove temporary staging after v1.0.4 release"
+          git push
