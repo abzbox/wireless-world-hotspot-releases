@@ -1,0 +1,23 @@
+name: Publish APK release
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild and verify APK
+        run: |
+          set -euo pipefail
+          cat staging/apk-part-* | tr -d '\n' | base64 -d > WirelessWorldHotspot.apk
+          echo "b577c444a8b9476acfdf4a4cb1afe657dc48bbe054819c5026b7e2f0ca958798  WirelessWorldHotspot.apk" | sha256sum -c -
+          test "$(wc -c < WirelessWorldHotspot.apk)" -eq 1870634
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v1.0.3 WirelessWorldHotspot.apk \
+            --title "Wireless World Hotspot v1.0.3" \
+            --notes "Public download of Wireless World Hotspot for Android (v1.0.3, versionCode 4). This APK contains no secrets. On your phone, open the APK and allow install from this source if Android asks."
